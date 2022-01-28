@@ -1,0 +1,36 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.YourUidGuide {
+  margin: 10px;
+}
+
+.Container {
+  display: flex;
+  justify-content: center;
+}
+
+.MyVideoContainer{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid black;
+  padding: 10px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  margin: 5px;
+}
+
+.RemoteVideoContainer{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid black;
+  padding: 10px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  margin: 5px;
+}

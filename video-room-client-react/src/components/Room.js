@@ -35,26 +35,8 @@ function Room(props) {
     socket.on(SocketEvent.OFFER, handleSocketOffer);
     socket.on(SocketEvent.ANSWER, handleSocketAnswer);
     socket.on(SocketEvent.ICE_CANDIDATES, handleSocketICECandidates);
+    socket.on(SocketEvent.DISCONNECT, handleSocketDisconnect);
   }, [peerConn])
-
-  // useEffect(() => {
-  //   myVideoRef.current.srcObject = stream;
-
-  //   if(stream === null && peerConn !== null){
-  //     peerConn.close();
-  //     setPeerConn(null);
-  //   }
-
-  //   if(stream !== null && peerConn === null){
-  //     let newPeerConn = createPeerConn();
-  //     setPeerConn(newPeerConn);
-  //   }
-
-  //   if(stream !== null && peerConn !== null){
-  //     stream.getTracks().forEach(track => peerConn.addTrack(track, stream));  //??
-  //   }
-
-  // }, [stream, peerConn]);
 
   useEffect(() => {
     myVideoRef.current.srcObject = stream;
@@ -81,16 +63,8 @@ function Room(props) {
         alert("Something went wrong...");
         navigate(-1);
         break;
-      // case UserStatus.OFFERING:
-      //   initiateICEOffer();
-      //   break;
     }
   }, [userStatus]);
-
-  // const initiateICEOffer = () => {
-  //   let newPeerConn = createPeerConn();
-  //   setPeerConn(newPeerConn);
-  // }
 
   //When you're the answerer
   const handleSocketOffer = (payload) => {
@@ -123,6 +97,10 @@ function Room(props) {
       peerConn.addIceCandidate(candidates).catch(err => console.log(err));
   };
 
+  const handleSocketDisconnect = () => {
+    navigate(-1);
+  }
+
   const createPeerConn = () => {
     const newPeerConn = new RTCPeerConnection({
       iceServers: [
@@ -140,6 +118,7 @@ function Room(props) {
     newPeerConn.onicecandidate = onICECandidate;
     newPeerConn.ontrack = onTrack;
     newPeerConn.onnegotiationneeded = () => onNegotiationNeeded(newPeerConn);
+    newPeerConn.oniceconnectionstatechange = onIceConnectionStateChange;
 
     return newPeerConn;
   };
@@ -177,6 +156,11 @@ function Room(props) {
         socket.emit(SocketEvent.OFFER, payload);
       }).catch(err => console.log(err))
   };
+
+  const onIceConnectionStateChange = ev => {
+    if(peerConn !== null)
+      console.log("ICE status changed to: "+peerConn.iceConnectionState)
+  }
 
   return (
     <div className="Room">

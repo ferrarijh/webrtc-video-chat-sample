@@ -4,6 +4,10 @@
     align-items: center;
 }
 
+.YourUidGuide {
+  margin: 10px;
+}
+
 .UserListContainer{
     display: flex;
     flex-direction: column;

@@ -1,34 +1,57 @@
 import {useState, useContext, useEffect, useRef} from 'react';
 import { useNavigate } from 'react-router-dom';
-import {connect, io} from 'socket.io-client'
 import { MediaContext } from './MediaProvider';
+import {UserStatus, UserStatusContext} from './UserStatusProvider'
 import './WaitingRoom.css'
+import { NetworkContext } from './NetworkProvider';
+import ReqReceivedModal from './ReqReceivedModal';
+import ReqSentModal from './ReqSentModal.js'
 
-const url = "http://localhost:8080/users";
+const usersUrl = "http://localhost:8080/users";
 
 const WaitingRoom = (props) => {
 
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const {stream, toggleMyCamera} = useContext(MediaContext);
+    const {uid, peerId, setPeerId, userStatus, setUserStatus} = useContext(UserStatusContext);
+    const {socket} = useContext(NetworkContext);
     const videoRef = useRef();
 
     useEffect(() => {
-        if(props.uid !== null)
-            updateUserList();
-    }, [props.uid]);
-
+        updateUserList();
+    }, []);
+    
     useEffect(() => {
         videoRef.current.srcObject = stream;
     }, [stream]);
 
     const handleClickUser = (ev) => {
-        navigate("/room/"+ev.target.value);
-    }
+        let newPeerId = ev.target.innerText;
+        setPeerId(newPeerId);
+        setUserStatus(UserStatus.REQ_SENT);
+        let payload = {offerer: uid, answerer: newPeerId}
+        socket.emit("JOIN_REQ", payload);
+    };
+    useEffect(() => {
+        if(peerId === null || uid === null)
+            return;
+
+        switch(userStatus){
+            case UserStatus.OFFERING:
+                navigate("/room/"+peerId);
+                break;
+            case UserStatus.REJECT:
+                setPeerId(null);
+                break;
+            case UserStatus.ANSWERING:
+                navigate("/room/"+uid);
+                break;
+        }
+    }, [userStatus, peerId, uid]);
 
     const updateUserList = () => {
-        const url = "http://localhost:8080/users";
-        fetch(url, {
+        fetch(usersUrl, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -39,29 +62,25 @@ const WaitingRoom = (props) => {
             return data;
         }).then(data => setUsers(data.user_list))
         .catch(err => console.log("fetch error: "+err));
-    }
-
-    const strCmp = (s1, s2) => {
-        if(s1.length !== s2.length)
-            return false;
-        for(let i=0; i<s1.length; i++)
-            if(s1[i] !== s2[i])
-                return false;
-        return true;
-    }
+    };
 
     return(
         <div className="WaitingRoom">
+
+            {userStatus === UserStatus.REQ_RECEIVED && <ReqReceivedModal/>}
+            {userStatus === UserStatus.REQ_SENT && <ReqSentModal/>}
+
+            <div className="YourUidGuide">Your uid: {uid}</div>
             <div className="UserListContainer">
                 <div>- Available Users -</div>
                 <button onClick={updateUserList}>Update List</button>
                 <div className="UserList">
-                { users.length === 0
+                { users.length <= 1
                     ? <div className="NoUsersGuide"><i>No available users now..</i></div>
-                    : users.filter(uid => uid !== props.uid)
-                        .map((uid, i) => {
-                            let cn = i%2 == 0 ? "UserEven" : "UserOdd";
-                            return <div className={cn} onClick={handleClickUser} key={i}>{uid}</div>;
+                    : users.filter(_uid => _uid !== uid)
+                        .map((_uid, i) => {
+                            let cn = i%2 === 0 ? "UserEven" : "UserOdd";
+                            return <div className={cn} onClick={handleClickUser} key={i}>{_uid}</div>;
                             }
                         )
                 }

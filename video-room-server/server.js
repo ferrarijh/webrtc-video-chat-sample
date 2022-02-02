@@ -33,9 +33,12 @@ io.on("connection", socket => {
 
     socket.on("disconnect", () => {
         let uid = sidToUid[socket.id];
-        if(room[uid].length >= 2)
+        if(room[uid] && room[uid].length >= 2)
             room[uid].filter(id => id != uid)
-                .forEach(id => {io.to(uidToSid[id]).emit("DISCONNECT");});
+                .forEach(id => {
+                    userMap[id] = UserStatus.AVAILABLE;
+                    io.to(uidToSid[id]).emit("DISCONNECT");
+                });
         delete room[uid];
         delete userMap[uid];
         delete sidToUid[socket.id];

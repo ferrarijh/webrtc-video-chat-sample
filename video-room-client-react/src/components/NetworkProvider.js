@@ -53,7 +53,8 @@ const NetworkProvider = (props) => {
 const SocketEvent = Object.freeze({
     OFFER: "OFFER",
     ANSWER: "ANSWER",
-    ICE_CANDIDATES: "ICE_CANDIDATES"
+    ICE_CANDIDATES: "ICE_CANDIDATES",
+    DISCONNECT: "DISCONNECT"
 })
 
 export default NetworkProvider;

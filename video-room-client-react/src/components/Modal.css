@@ -1,0 +1,30 @@
+.ModalContainer {
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    
+    display: flex;
+}
+
+.ReqReceivedModal {
+    margin: auto;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid black;
+}
+
+.ReqSentModal {
+    margin: auto;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid black;
+}
+
+.Buttons{
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 20px;
+}

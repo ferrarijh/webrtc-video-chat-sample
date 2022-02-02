@@ -15,7 +15,7 @@ const MediaProvider = (props) => {
 
     const activateCamera = () => {
         navigator.mediaDevices.getUserMedia({
-            audio: false,
+            audio: true,
             video: {
                 width: 320,
                 height: 240

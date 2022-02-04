@@ -1,32 +1,46 @@
 import React, { useEffect, useState, useContext} from 'react';
+import {useLocation} from 'react-router-dom';
 import {io} from 'socket.io-client';
 import { UserStatusContext, UserStatus } from './UserStatusProvider';
 
-const NetworkContext = React.createContext();
+const SocketContext = React.createContext();
 
-const NetworkProvider = (props) => {
+const SocketProvider = (props) => {
 
+    const location = useLocation();
     const [socket, setSocket] = useState(null);
+    const [socketStatus, setSocketStatus] = useState(SocketStatus.DISCONNECTED);
     const {uid, setUserStatus, setPeerId} = useContext(UserStatusContext);
 
     useEffect(() => {
         if(uid === null)
             return;
 
-        let newSocket = io("ws://localhost:8080/");
+        let newSocket = io("ws://"+Address.HOST+":"+Address.PORT);
         setSocket(newSocket);
 
         newSocket.emit("INIT", {uid: uid});
 
+        newSocket.on("connect", handleConnect);
         newSocket.on("disconnect", handleDisconnect);
         newSocket.on("JOIN_REQ", handleJoinReq);
         newSocket.on("REJECT", handleReject);
         newSocket.on("JOIN_OK", handleJoinOk)
     }, [uid]);
-    
+
+    useEffect(() => {
+        let pathArr = location.pathname.split("/");
+        if(pathArr[pathArr.length-1] === "waiting-room" && socket !== null)
+            socket.emit("INIT", {uid: uid});
+    }, [location.pathname])
+
+    const handleConnect = () => {
+        setSocketStatus(SocketStatus.CONNECTED);
+    }
+
     const handleDisconnect = () => {
-        alert("Disconnected with signaling server...")
-        // navigate("/waiting-room", {replace: true});
+        setSocketStatus(SocketStatus.DISCONNECTED);
+        alert("Disconnected from signaling server...");
     }
 
     const handleJoinReq = (offerer) => {
@@ -44,11 +58,16 @@ const NetworkProvider = (props) => {
     }
 
     return (
-        <NetworkContext.Provider value={{socket, setSocket}}>
+        <SocketContext.Provider value={{socket, setSocket, socketStatus, setSocketStatus}}>
             {props.children}
-        </NetworkContext.Provider>
+        </SocketContext.Provider>
     );
 };
+
+const SocketStatus = Object.freeze({
+    CONNECTED: "CONNECTED",
+    DISCONNECTED: "DISCONNECTED"
+})
 
 const SocketEvent = Object.freeze({
     OFFER: "OFFER",
@@ -57,5 +76,11 @@ const SocketEvent = Object.freeze({
     DISCONNECT: "DISCONNECT"
 })
 
-export default NetworkProvider;
-export {NetworkContext, SocketEvent};
+const Address = Object.freeze({
+    // HOST: "localhost",
+    HOST: "13.125.102.64",
+    PORT: "8080"
+})
+
+export default SocketProvider;
+export {SocketContext, SocketStatus, SocketEvent, Address};

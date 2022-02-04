@@ -1,6 +1,7 @@
 const http = require('http');
 const express = require('express');
 const {Server} = require('socket.io');
+const { json } = require('body-parser');
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -31,8 +32,9 @@ app.get("/users", (req, res) => {
 
 io.on("connection", socket => {
 
-    socket.on("disconnect", () => {
+    socket.once("disconnect", () => {
         let uid = sidToUid[socket.id];
+        console.log("disconnect from "+uid);
         if(room[uid] && room[uid].length >= 2)
             room[uid].filter(id => id != uid)
                 .forEach(id => {
@@ -43,18 +45,17 @@ io.on("connection", socket => {
         delete userMap[uid];
         delete sidToUid[socket.id];
         delete uidToSid[uid];
+        console.log("userMap after delete: "+JSON.stringify(userMap));
     });
 
     socket.on("INIT", payload => {
         let uid = payload.uid;
+        console.log("INIT uid="+uid);
         userMap[uid] = UserStatus.AVAILABLE;
         uidToSid[uid] = socket.id;
         room[uid] = [uid];
         sidToUid[socket.id] = uid;
     });
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /* For room */
 
     //Issued socket is the host.
     //Issuing socket joins the host's room.

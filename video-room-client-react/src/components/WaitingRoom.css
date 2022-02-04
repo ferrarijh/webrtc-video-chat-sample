@@ -5,10 +5,23 @@
 }
 
 .YourUidGuide {
-  margin: 10px;
+  margin-top: 10px;
+}
+
+.SocketConnected{
+    color: #aaf;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.SocketDisconnected{
+    color: #faa;
+    font-style: italic;
+    margin-top: 10px;
 }
 
 .UserListContainer{
+    margin-top: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,8 +43,16 @@
     background-color: #eef;
 }
 
+.UserOdd:hover{
+    background-color: #ddf;
+}
+
 .UserEven{
     background-color: #ccf;
+}
+
+.UserEven:hover{
+    background-color: #bbf;
 }
 
 .NoUsersGuide{

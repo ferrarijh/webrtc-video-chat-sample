@@ -1,17 +1,18 @@
 import React, { useContext } from 'react';
 import { UserStatus, UserStatusContext } from './UserStatusProvider';
-import {NetworkContext} from './NetworkProvider'
+import {SocketContext} from './SocketProvider'
 import './Modal.css';
 
-const ReqReceivedModal = () => {
+const ReqReceivedModal = (props) => {
 
     const { uid, setUserStatus, peerId } = useContext(UserStatusContext);
-    const {socket} = useContext(NetworkContext);
+    const {socket} = useContext(SocketContext);
 
     const handleAccept = () => {
         console.log("JOIN_OK from "+uid+" to "+peerId);
         socket.emit("JOIN_OK", {answerer: uid, offerer: peerId});
         setUserStatus(UserStatus.ANSWERING);
+        props.setJoining(true);
     }
 
     const handleReject = () => {

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, useContext } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-import { UserStatusContext, UserStatus } from './UserStatusProvider'
+import { useEffect, useRef, useState, useContext } from 'react';
+import { useNavigate, useParams} from 'react-router-dom';
+import { UserStatusContext, UserStatus } from './UserStatusProvider';
 import { MediaContext } from './MediaProvider';
-import { NetworkContext, SocketEvent } from './NetworkProvider'
+import { SocketContext, SocketStatus, SocketEvent } from './SocketProvider';
 import './Room.css';
 
 function Room(props) {
@@ -14,8 +14,8 @@ function Room(props) {
   const params = useParams();
 
   const { stream, toggleMyCamera } = useContext(MediaContext);
-  const { socket } = useContext(NetworkContext);
-  const { uid, userStatus, peerId } = useContext(UserStatusContext);
+  const { socket, socketStatus } = useContext(SocketContext);
+  const { uid, setUserStatus, peerId } = useContext(UserStatusContext);
 
   const [roomId, setRoomId] = useState(null);
   const [peerConn, setPeerConn] = useState(null);
@@ -26,6 +26,12 @@ function Room(props) {
 
     let newPeerConn = createPeerConn();
     setPeerConn(newPeerConn);
+    return () => {
+      console.log("in cleanup...");
+      setUserStatus(UserStatus.AVAILABLE);
+      if(peerConn !== null)
+        peerConn.close();
+    }
   }, []);
 
   useEffect(() => {
@@ -35,7 +41,6 @@ function Room(props) {
     socket.on(SocketEvent.OFFER, handleSocketOffer);
     socket.on(SocketEvent.ANSWER, handleSocketAnswer);
     socket.on(SocketEvent.ICE_CANDIDATES, handleSocketICECandidates);
-    socket.on(SocketEvent.DISCONNECT, handleSocketDisconnect);
   }, [peerConn])
 
   useEffect(() => {
@@ -58,13 +63,12 @@ function Room(props) {
   }, [stream])
 
   useEffect(() => {
-    switch(userStatus){
-      case UserStatus.AVAILABLE:
-        alert("Something went wrong...");
-        navigate(-1);
-        break;
+    if(socketStatus === SocketStatus.DISCONNECTED){
+      navigate("/waiting-room", {replace: true});
+      if(peerConn !== null)
+        peerConn.close();
     }
-  }, [userStatus]);
+  }, [socketStatus])
 
   //When you're the answerer
   const handleSocketOffer = (payload) => {
@@ -96,10 +100,6 @@ function Room(props) {
     if(peerConn !== null)
       peerConn.addIceCandidate(candidates).catch(err => console.log(err));
   };
-
-  const handleSocketDisconnect = () => {
-    navigate(-1);
-  }
 
   const createPeerConn = () => {
     const newPeerConn = new RTCPeerConnection({

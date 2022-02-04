@@ -4,7 +4,7 @@ import WaitingRoom from './components/WaitingRoom';
 import Room from './components/Room';
 import './App.css';
 import MediaProvider from './components/MediaProvider';
-import NetworkProvider from './components/NetworkProvider'
+import SocketProvider from './components/SocketProvider'
 import UserStatusProvider from './components/UserStatusProvider';
 
 const App = () => {
@@ -15,7 +15,7 @@ const App = () => {
             
             <MediaProvider>
             <UserStatusProvider>
-            <NetworkProvider>
+            <SocketProvider>
 
                 <Routes>
                     <Route path="/" element={<Navigate to="/waiting-room"/>}/>
@@ -23,7 +23,7 @@ const App = () => {
                     <Route path="/room/:roomId" element={<Room/>} />
                 </Routes>
 
-            </NetworkProvider>
+            </SocketProvider>
             </UserStatusProvider>
             </MediaProvider>
             

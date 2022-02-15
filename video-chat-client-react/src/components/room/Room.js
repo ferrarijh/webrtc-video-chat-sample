@@ -174,14 +174,14 @@ function Room(props) {
       <div className="Container">
         <div className="MyVideoContainer">
           <div>This is your video.</div>
-          <video className="MyVideo" playsInline autoPlay ref={myVideoRef}></video>
+          <video className="MyVideo" playsInline autoPlay ref={myVideoRef} width="320" height="240"></video>
           <div><button className="ToggleMyVideo" onClick={toggleMyCamera}>
             {stream === null ? "Activate Camera" : "Hang Up"}
           </button></div>
         </div>
         <div className="PeerVideoContainer">
           <div>This is remote video.</div>
-          <video className="PeerVideo" playsInline autoPlay ref={peerVideoRef} ></video>
+          <video className="PeerVideo" playsInline autoPlay ref={peerVideoRef} width="320" height="240"></video>
         </div>
       </div>
     </div>

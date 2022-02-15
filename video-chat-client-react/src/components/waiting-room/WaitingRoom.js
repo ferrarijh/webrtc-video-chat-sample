@@ -1,11 +1,11 @@
 import {useState, useContext, useEffect, useRef} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MediaContext } from './MediaProvider';
-import {UserStatus, UserStatusContext} from './UserStatusProvider'
-import './WaitingRoom.css'
-import { Address, SocketContext, SocketStatus } from './SocketProvider';
+import { MediaContext } from '../contexts/MediaProvider';
+import {UserStatus, UserStatusContext} from '../contexts/UserStatusProvider'
+import { Address, SocketContext, SocketStatus } from '../contexts/SocketProvider';
 import ReqReceivedModal from './ReqReceivedModal';
 import ReqSentModal from './ReqSentModal.js'
+import './WaitingRoom.css'
 
 const usersUrl = "http://"+Address.HOST+":"+Address.PORT+"/users";
 

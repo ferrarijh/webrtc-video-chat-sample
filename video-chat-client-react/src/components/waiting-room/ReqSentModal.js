@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { UserStatusContext } from './UserStatusProvider';
+import { UserStatusContext } from '../contexts/UserStatusProvider';
 
 const ReqSentModal = () => {
 

@@ -77,8 +77,8 @@ const SocketEvent = Object.freeze({
 })
 
 const Address = Object.freeze({
-    // HOST: "localhost",
-    HOST: "13.125.102.64",
+    HOST: "localhost",
+    // HOST: "13.125.102.64",
     PORT: "8080"
 })
 

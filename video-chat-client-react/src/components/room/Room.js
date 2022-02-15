@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useContext } from 'react';
 import { useNavigate, useParams} from 'react-router-dom';
-import { UserStatusContext, UserStatus } from './UserStatusProvider';
-import { MediaContext } from './MediaProvider';
-import { SocketContext, SocketStatus, SocketEvent } from './SocketProvider';
+import { UserStatusContext, UserStatus } from '../contexts/UserStatusProvider';
+import { MediaContext } from '../contexts/MediaProvider';
+import { SocketContext, SocketStatus, SocketEvent } from '../contexts/SocketProvider';
 import './Room.css';
 
 function Room(props) {
@@ -126,6 +126,10 @@ function Room(props) {
   const onTrack = (ev) => {
     console.log("ontrack..");
     peerVideoRef.current.srcObject = ev.streams[0]; //array??
+
+    ev.streams[0].oninactive = () => {
+      peerVideoRef.current.srcObject = null;
+    }
   };
 
   const onICECandidate = (ev) => {

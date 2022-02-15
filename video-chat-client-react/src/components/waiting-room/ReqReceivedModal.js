@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { UserStatus, UserStatusContext } from './UserStatusProvider';
-import {SocketContext} from './SocketProvider'
+import { UserStatus, UserStatusContext } from '../contexts/UserStatusProvider';
+import {SocketContext} from '../contexts/SocketProvider'
 import './Modal.css';
 
 const ReqReceivedModal = (props) => {
